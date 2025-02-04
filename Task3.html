@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Timer</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: black;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        main {
+            display: flex;
+            justify-content: space-around;
+            padding:125px;
+        }
+
+        #timer {
+            text-align: center;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #timer-display {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #task-list {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        #tasks {
+            list-style: none;
+            padding: 0;
+        }
+
+        #tasks li {
+            margin: 10px 0;
+        }
+
+        #break-notification {
+            display: none;
+            background-color: #f44336;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            padding:10px;
+            background-color: #333;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Pomodoro Timer</h1>
+    </header>
+
+    <main>
+        <section id="timer">
+            <h2>Focus Timer</h2>
+            <div id="timer-display">25:00</div>
+            <button id="start-pause-btn">Start</button>
+            <button id="reset-btn">Reset</button>
+        </section>
+
+        <section id="task-list">
+            <h2>Task List</h2>
+            <input type="text" id="task-input" placeholder="Add a task">
+            <button id="add-task-btn">Add Task</button>
+            <ul id="tasks">
+             </ul>
+        </section>
+
+        <section id="notifications">
+            <div id="break-notification">Time for a break!</div>
+        </section>
+    </main>
+     <footer>
+             <p>Created by vinisha</p>
+     </footer>
+           <script>
+        let timer;
+        let isRunning = false;
+        let timeLeft = 25 * 60; 
+        let timerDisplay = document.getElementById('timer-display');
+        let startPauseBtn = document.getElementById('start-pause-btn');
+        let resetBtn = document.getElementById('reset-btn');
+        let breakNotification = document.getElementById('break-notification');
+        let addTaskBtn = document.getElementById('add-task-btn');
+        let taskInput = document.getElementById('task-input');
+        let tasksContainer = document.getElementById('tasks');
+        startPauseBtn.addEventListener('click', toggleTimer);
+        resetBtn.addEventListener('click', resetTimer);
+        addTaskBtn.addEventListener('click', addTask);
+
+        function toggleTimer() {
+            if (isRunning) {
+                clearInterval(timer);
+                startPauseBtn.textContent = 'Start';
+            } else {
+                timer = setInterval(updateTimer, 1000);
+                startPauseBtn.textContent = 'Pause';
+            }
+            isRunning = !isRunning;
+        }
+
+        function updateTimer() {
+            timeLeft--;
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `${formatTime(minutes)}:${formatTime(seconds)}`;
+
+            if (timeLeft === 0) {
+                clearInterval(timer);
+                breakNotification.style.display = 'block'; 
+                setTimeout(() => breakNotification.style.display = 'none', 5000); 
+            }
+        }
+
+        function formatTime(time) {
+            return time < 10 ? `0${time}` : time;
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            timeLeft = 25 * 60; 
+            timerDisplay.textContent = '25:00';
+            isRunning = false;
+            startPauseBtn.textContent = 'Start';
+        }
+
+        function addTask() {
+            let taskText = taskInput.value.trim();
+            if (taskText === "") {
+                alert("Please enter a valid task.");
+                return;
+            }
+
+            let taskItem = document.createElement('li');
+            taskItem.innerHTML = `
+                <input type="checkbox" class="task-checkbox"> ${taskText} <button class="delete-task-btn">Delete</button>
+            `;
+            tasksContainer.appendChild(taskItem);
+            taskInput.value = '';  
+            let deleteBtn = taskItem.querySelector('.delete-task-btn');
+            deleteBtn.addEventListener('click', () => {
+                taskItem.remove();
+            });
+
+            let checkbox = taskItem.querySelector('.task-checkbox');
+            checkbox.addEventListener('change', () => {
+                taskItem.style.textDecoration = checkbox.checked ? 'line-through' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>
